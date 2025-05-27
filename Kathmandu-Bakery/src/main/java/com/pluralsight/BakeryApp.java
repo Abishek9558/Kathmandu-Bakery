@@ -14,6 +14,7 @@ import com.pluralsight.topping.Meat;
 import com.pluralsight.topping.RegularTopping;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -116,10 +117,8 @@ public class BakeryApp {
     }
 
     static void saveReceipt(Order order) {
-        String fileName = String.format("receipt-%tF-%<tH%<tM%<tS.txt", new Date());
-        File dir = new File("receipts");
-        if (!dir.exists()) dir.mkdir();
-        try (PrintWriter out = new PrintWriter(new File(dir, fileName))) {
+        String fileName = String.format("src/main/resources/receiptssaver/receipt-%tF-%<tH%<tM%<tS.txt", new Date());
+        try (FileWriter fw = new FileWriter(fileName); PrintWriter out = new PrintWriter(fw)) {
             out.println(order.getDetails());
             System.out.println("Receipt saved to " + fileName);
         } catch (IOException e) {
