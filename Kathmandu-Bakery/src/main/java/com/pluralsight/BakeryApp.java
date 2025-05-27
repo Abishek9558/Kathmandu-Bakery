@@ -1,133 +1,134 @@
 package com.pluralsight;
 
+import com.pluralsight.bread.*;
+import com.pluralsight.drink.*;
+import com.pluralsight.food.Sandwich;
+import com.pluralsight.order.Order;
+import com.pluralsight.size.LargeSize;
+import com.pluralsight.size.MediumSize;
+import com.pluralsight.size.SandwichSize;
+import com.pluralsight.size.SmallSize;
+import com.pluralsight.snack.Chips;
+import com.pluralsight.topping.Cheese;
+import com.pluralsight.topping.Meat;
+import com.pluralsight.topping.RegularTopping;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 import java.util.Scanner;
 
 public class BakeryApp {
+    static Scanner sc = new Scanner(System.in);
+
     public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
-        boolean running = true;
-
-        while (running) {
-            System.out.println("\n===== Welcome to Kathmandu-Bakery =====");
-            System.out.println("1) New Order");
-            System.out.println("0) Exit");
-            System.out.print("Select an option: ");
-            String choice = scanner.nextLine();
-
-            switch (choice) {
-                case "1" -> handleNewOrder(scanner);
-                case "0" -> {
-                    System.out.println("Thank you for visiting Kathmandu-Bakery!");
-                    running = false;
-                }
-                default -> System.out.println("Invalid option. Please try again.");
-            }
+        while (true) {
+            System.out.println("Welcome to Kathmandu-Bakery\n1) New Order\n0) Exit");
+            int choice = sc.nextInt();
+            if (choice == 0) break;
+            if (choice == 1) handleOrder();
         }
-
-        scanner.close();
     }
 
-    private static void handleNewOrder(Scanner scanner) {
+    static void handleOrder() {
         Order order = new Order();
-        boolean ordering = true;
-
-        while (ordering) {
-            System.out.println("\n--- New Order ---");
-            System.out.println("1) Add Sandwich");
-            System.out.println("2) Add Drink");
-            System.out.println("3) Add Chips");
-            System.out.println("4) Checkout");
-            System.out.println("0) Cancel Order");
-            System.out.print("Select an option: ");
-            String choice = scanner.nextLine();
-
-            switch (choice) {
-                case "1" -> order.addSandwich(buildSandwich(scanner));
-                case "2" -> order.addDrink(buildDrink(scanner));
-                case "3" -> order.addChips(buildChips(scanner));
-                case "4" -> {
-                    System.out.println("\n" + order);
-                    System.out.print("Confirm order? (yes/no): ");
-                    if (scanner.nextLine().equalsIgnoreCase("yes")) {
-                        ReceiptWriter.saveOrder(order);
-                        System.out.println("Order saved. Returning to main menu.");
-                    }
-                    ordering = false;
-                }
-                case "0" -> {
-                    System.out.println("Order canceled. Returning to main menu.");
-                    ordering = false;
-                }
-                default -> System.out.println("Invalid option. Try again.");
+        while (true) {
+            System.out.println("1) Add Sandwich\n2) Add Drink\n3) Add Chips\n4) Checkout\n0) Cancel Order");
+            int option = sc.nextInt(); sc.nextLine();
+            switch (option) {
+                case 0: return;
+                case 1: order.addSandwich(createSandwich()); break;
+                case 2: order.addDrink(createDrink()); break;
+                case 3: order.addChips(new Chips(prompt("Enter chip type:"))); break;
+                case 4:
+                    System.out.println(order.getDetails());
+                    saveReceipt(order);
+                    return;
             }
         }
     }
 
-    private static Sandwich buildSandwich(Scanner scanner) {
-        System.out.println("\nChoose Bread Type:");
-        for (BreadType b : BreadType.values()) {
-            System.out.println(b.ordinal() + 1 + ") " + b);
-        }
-        BreadType bread = BreadType.values()[Integer.parseInt(scanner.nextLine()) - 1];
-
-        System.out.println("Choose Sandwich Size:\n1) 4\"\n2) 8\"\n3) 12\"");
-        SandwichSize size = switch (scanner.nextLine()) {
-            case "1" -> SandwichSize.SMALL_4;
-            case "2" -> SandwichSize.MEDIUM_8;
-            case "3" -> SandwichSize.LARGE_12;
-            default -> throw new IllegalArgumentException("Invalid size");
+    static Sandwich createSandwich() {
+        SandwichSize size = switch (prompt("Size (4/8/12):")) {
+            case "4" -> new SmallSize();
+            case "8" -> new MediumSize();
+            default -> new LargeSize();
         };
-
-        System.out.print("Toasted? (yes/no): ");
-        boolean toasted = scanner.nextLine().equalsIgnoreCase("yes");
-
+        Bread bread = switch (prompt("Bread (white/wheat/rye/wrap):")) {
+            case "white" -> new WhiteBread();
+            case "wheat" -> new WheatBread();
+            case "rye" -> new RyeBread();
+            default -> new WrapBread();
+        };
+        boolean toasted = prompt("Toasted? (yes/no):").equalsIgnoreCase("yes");
         Sandwich sandwich = new Sandwich(size, bread, toasted);
 
-        System.out.println("Add meats (comma-separated, e.g. steak,ham):");
-        for (String meat : scanner.nextLine().split(",")) {
-            if (!meat.isBlank()) sandwich.addTopping(new Meat(meat.trim(), false));
-        }
+        while (true) {
+            System.out.println("Select topping type: 1) Meat 2) Cheese 3) Regular 0) Done");
+            String toppingType = sc.nextLine();
+            if (toppingType.equals("0")) break;
 
-        System.out.println("Add extra meats (comma-separated):");
-        for (String meat : scanner.nextLine().split(",")) {
-            if (!meat.isBlank()) sandwich.addTopping(new Meat(meat.trim(), true));
-        }
+            List<String> options = new ArrayList<>();
+            if (toppingType.equals("1")) {
+                options = List.of("Steak", "Ham", "Salami", "Roast Beef", "Chicken", "Bacon");
+            } else if (toppingType.equals("2")) {
+                options = List.of("American", "Provolone", "Cheddar", "Swiss");
+            } else if (toppingType.equals("3")) {
+                options = List.of("Lettuce", "Peppers", "Onions", "Tomatoes", "Jalapeños",
+                        "Cucumbers", "Pickles", "Guacamole", "Mushrooms",
+                        "Mayo", "Mustard", "Ketchup", "Ranch",
+                        "Thousand Islands", "Vinaigrette", "Au Jus", "Sauce");
+            } else {
+                System.out.println("Invalid option. Try again.");
+                continue;
+            }
 
-        System.out.println("Add cheeses (comma-separated):");
-        for (String cheese : scanner.nextLine().split(",")) {
-            if (!cheese.isBlank()) sandwich.addTopping(new Cheese(cheese.trim(), false));
+            for (int i = 0; i < options.size(); i++)
+                System.out.println((i + 1) + ") " + options.get(i));
+            System.out.print("Choose topping number: ");
+            int choice = Integer.parseInt(sc.nextLine());
+            if (choice < 1 || choice > options.size()) {
+                System.out.println("Invalid choice.");
+                continue;
+            }
+            String name = options.get(choice - 1);
+            switch (toppingType) {
+                case "1" -> sandwich.addTopping(new Meat(name));
+                case "2" -> sandwich.addTopping(new Cheese(name));
+                case "3" -> sandwich.addTopping(new RegularTopping(name));
+            }
+            System.out.println(name + " added.");
         }
-
-        System.out.println("Add extra cheeses (comma-separated):");
-        for (String cheese : scanner.nextLine().split(",")) {
-            if (!cheese.isBlank()) sandwich.addTopping(new Cheese(cheese.trim(), true));
-        }
-
-        System.out.println("Add regular toppings (comma-separated):");
-        for (String topping : scanner.nextLine().split(",")) {
-            if (!topping.isBlank()) sandwich.addTopping(new RegularTopping(topping.trim()));
-        }
-
         return sandwich;
     }
 
-    private static Drink buildDrink(Scanner scanner) {
-        System.out.println("\nChoose Drink Size:\n1) Small\n2) Medium\n3) Large");
-        DrinkSize size = switch (scanner.nextLine()) {
-            case "1" -> DrinkSize.SMALL;
-            case "2" -> DrinkSize.MEDIUM;
-            case "3" -> DrinkSize.LARGE;
-            default -> throw new IllegalArgumentException("Invalid drink size");
+    static Drink createDrink() {
+        DrinkSize size = switch (prompt("Drink size (s/m/l):")) {
+            case "s" -> new SmallDrink();
+            case "m" -> new MediumDrink();
+            default -> new LargeDrink();
         };
-
-        System.out.print("Enter drink flavor: ");
-        String flavor = scanner.nextLine();
-
+        String flavor = prompt("Flavor:");
         return new Drink(size, flavor);
     }
 
-    private static Chips buildChips(Scanner scanner) {
-        System.out.print("\nEnter chip type: ");
-        return new Chips(scanner.nextLine());
+    static void saveReceipt(Order order) {
+        String fileName = String.format("receipt-%tF-%<tH%<tM%<tS.txt", new Date());
+        File dir = new File("receipts");
+        if (!dir.exists()) dir.mkdir();
+        try (PrintWriter out = new PrintWriter(new File(dir, fileName))) {
+            out.println(order.getDetails());
+            System.out.println("Receipt saved to " + fileName);
+        } catch (IOException e) {
+            System.out.println("Error saving receipt.");
+        }
+    }
+
+    static String prompt(String msg) {
+        System.out.print(msg + " ");
+        return sc.nextLine();
     }
 }
