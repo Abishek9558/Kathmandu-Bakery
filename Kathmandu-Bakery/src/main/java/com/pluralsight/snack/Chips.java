@@ -1,6 +1,6 @@
 package com.pluralsight.snack;
 
-public class Chips {
+public class Chips { //chips snack for a fixed price
     private String type;
     public Chips(String type) { this.type = type; }
     public double getPrice() { return 1.50; }

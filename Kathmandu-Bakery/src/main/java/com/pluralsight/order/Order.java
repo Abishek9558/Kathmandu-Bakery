@@ -7,7 +7,7 @@ import com.pluralsight.snack.Chips;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Order {
+public class Order { // customers full order with all food and drinks
     private List<Sandwich> sandwiches = new ArrayList<>();
     private List<Drink> drinks = new ArrayList<>();
     private List<Chips> chips = new ArrayList<>();
@@ -20,7 +20,7 @@ public class Order {
                 drinks.stream().mapToDouble(Drink::getPrice).sum() +
                 chips.stream().mapToDouble(Chips::getPrice).sum();
     }
-    public String getDetails() {
+    public String getDetails() { //prints aa items and total
         StringBuilder sb = new StringBuilder("Order Details:\n");
         for (Sandwich s : sandwiches) sb.append(s).append("\n");
         for (Drink d : drinks) sb.append(d).append("\n");

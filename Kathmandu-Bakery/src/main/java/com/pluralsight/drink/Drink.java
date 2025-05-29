@@ -1,6 +1,6 @@
 package com.pluralsight.drink;
 
-public class Drink {
+public class Drink { //drinks with size and flavor
     private DrinkSize size;
     private String flavor;
     public Drink(DrinkSize size, String flavor) {

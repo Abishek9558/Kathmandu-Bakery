@@ -34,7 +34,7 @@ public class BakeryApp {
         }
     }
 
-    static void handleOrder() {
+    static void handleOrder() { // users build and checkout the order
         Order order = new Order();
         while (true) {
             System.out.println("1) Add Sandwich\n2) Add Drink\n3) Add Chips\n4) Checkout\n0) Cancel Order");
@@ -52,7 +52,7 @@ public class BakeryApp {
         }
     }
 
-    static Sandwich createSandwich() {
+    static Sandwich createSandwich() { //builds sandwich from user choices
         SandwichSize size = switch (prompt("Size (4/8/12):")) {
             case "4" -> new SmallSize();
             case "8" -> new MediumSize();
@@ -115,7 +115,7 @@ public class BakeryApp {
         String flavor = prompt("Flavor:");
         return new Drink(size, flavor);
     }
-
+/*method for timestamp filename and saving the receipts */
     static void saveReceipt(Order order) {
         String fileName = String.format("src/main/resources/receiptssaver/receipt-%tF-%<tH%<tM%<tS.txt", new Date());
         try (FileWriter fw = new FileWriter(fileName); PrintWriter out = new PrintWriter(fw)) {

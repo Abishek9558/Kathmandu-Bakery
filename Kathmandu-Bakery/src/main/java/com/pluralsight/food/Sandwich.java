@@ -7,7 +7,7 @@ import com.pluralsight.topping.Topping;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Sandwich {
+public class Sandwich { //sandwich made with bread toppings and toast option
     private SandwichSize size;
     private Bread bread;
     private boolean toasted;
