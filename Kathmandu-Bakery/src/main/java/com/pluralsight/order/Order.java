@@ -20,7 +20,7 @@ public class Order { // customers full order with all food and drinks
                 drinks.stream().mapToDouble(Drink::getPrice).sum() +
                 chips.stream().mapToDouble(Chips::getPrice).sum();
     }
-    public String getDetails() { //prints aa items and total
+    public String getDetails() { //prints aall items and total
         StringBuilder sb = new StringBuilder("Order Details:\n");
         for (Sandwich s : sandwiches) sb.append(s).append("\n");
         for (Drink d : drinks) sb.append(d).append("\n");
